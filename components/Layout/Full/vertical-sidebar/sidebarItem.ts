@@ -46,9 +46,9 @@ const sidebarItem: menu[] = [
 
   { header: 'Account' },
   {
-    title: 'Login',
-    icon: LoginIcon,
-    to: '/auth/login'
+    title: 'Add Admin',
+    icon: AlertCircleIcon,
+    to: '/pages/addAdmin'
 },
 { header: 'Payments' },
 {
@@ -66,6 +66,11 @@ const sidebarItem: menu[] = [
     title: 'Email',
     icon: ApertureIcon,
     to: '/pages/Email'
+},
+{
+  title: 'Inbox',
+  icon: BoxMultiple1Icon,
+  to: '/pages/inbox'
 },
 {
   title: 'Feedbacks',

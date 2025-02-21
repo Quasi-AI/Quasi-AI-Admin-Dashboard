@@ -6,6 +6,7 @@ import { Menu2Icon, BellRingingIcon } from 'vue-tabler-icons';
 const sidebarMenu = shallowRef(sidebarItems);
 const sDrawer = ref(true);
 
+
 </script>
 
 <template>

@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useTheme } from 'vuetify';
+
 const theme = useTheme();
 const primary = theme.current.value.colors.primary;
 const lightprimary = theme.current.value.colors.lightprimary;
+
+const isUnderDevelopment = ref(true);
+
 const chartOptions = computed(() => {
     return {
         series: [5368, 3500, 4106],
-        labels: ["5368", "Refferal Traffic", "Oragnic Traffic"],
+        labels: ["5368", "Referral Traffic", "Organic Traffic"],
         chart: {
             height: 170,
             type: "donut",
             fontFamily: "Plus Jakarta Sans', sans-serif",
             foreColor: "#c6d1e9",
         },
-
         tooltip: {
             theme: "dark",
             fillSeriesColor: false,
         },
-
         colors: ["#e7ecf0", "#fb977d", primary],
         dataLabels: {
             enabled: false,
         },
-
         legend: {
             show: false,
         },
-
         stroke: {
             show: false,
         },
@@ -63,11 +63,12 @@ const chartOptions = computed(() => {
                 },
             },
         },
-
     };
 });
+
 const Chart = [38, 40, 25];
 </script>
+
 <template>
     <v-card elevation="10" class="withbg pa-3">
         <v-card-item>
@@ -107,3 +108,4 @@ const Chart = [38, 40, 25];
         </v-card-item>
     </v-card>
 </template>
+

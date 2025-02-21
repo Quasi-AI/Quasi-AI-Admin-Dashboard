@@ -1,10 +1,21 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+
 import ProfitExpanse from "@/components/dashboards/ProfitExpense.vue";
 import TrafficDistribution from "@/components/dashboards/TrafficDistribution.vue";
 import ProductSales from "@/components/dashboards/ProductSales.vue";
 import UpcommingSchedule from "@/components/dashboards/UpcommingSchedule.vue";
 import TopPayingClients from "@/components/dashboards/TopPayingClients.vue";
+
+const router = useRouter();
+
+onMounted(() => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    router.push("/auth/login"); // Redirect to login if no token
+  }
+});
 </script>
 
 <template>
@@ -28,3 +39,4 @@ import TopPayingClients from "@/components/dashboards/TopPayingClients.vue";
     </v-col>
   </v-row>
 </template>
+
