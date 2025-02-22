@@ -19,6 +19,7 @@
     "apexcharts": "3.36.3",
     "axios": "^1.7.9",
     "sass": "^1.49.9",
+    "uuid": "^11.1.0",
     "vue": "3.3.4",
     "vue-tabler-icons": "2.9.0",
     "vue3-apexcharts": "1.4.1",
