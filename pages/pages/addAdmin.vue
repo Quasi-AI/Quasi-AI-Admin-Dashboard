@@ -43,7 +43,7 @@
                                 </tr>
                             </tbody>
                         </v-table>
-                        <div v-if="loading" class="loading-text">Loading more educators...</div>
+                        <div v-if="loading" class="loading-text">Loading more admin...</div>
                     </div>
                 </UiChildCard>
             </v-col>

@@ -49,7 +49,12 @@ const sidebarItem: menu[] = [
     title: 'Add Admin',
     icon: AlertCircleIcon,
     to: '/pages/addAdmin'
-},
+  },
+  {
+    title: 'Access Level',
+    icon: AlertCircleIcon,
+    to: '/pages/accessLevel'
+  },
 { header: 'Payments' },
 {
     title: 'Payment history',
