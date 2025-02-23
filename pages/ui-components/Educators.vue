@@ -86,7 +86,7 @@ const loadMoreData = async () => {
             hasMore.value = false;
         } else {
             // 🔥 Ensure no duplicates by using a Set
-            const newStudents = response.data.filter(student => 
+            const newStudents = response.data.data.filter(student => 
                 !allStudents.value.some(existing => existing.id === student.id)
             );
 
