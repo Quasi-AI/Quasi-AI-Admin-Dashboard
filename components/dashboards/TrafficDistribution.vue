@@ -11,7 +11,7 @@ const isUnderDevelopment = ref(true);
 const chartOptions = computed(() => {
     return {
         series: [5368, 3500, 4106],
-        labels: ["5368", "Referral Traffic", "Organic Traffic"],
+        labels: ["5368", "Students Traffic", "Educators Traffic"],
         chart: {
             height: 170,
             type: "donut",
@@ -78,12 +78,12 @@ const Chart = [38, 40, 25];
             <v-row>
                 <v-col cols="6" sm="7">
                     <div class="mt-6">
-                        <h3 class="text-h4">$36,358</h3>
+                        <h3 class="text-h4">$0</h3>
                         <div class="mt-2">
                             <v-avatar class="bg-lightsuccess text-success" size="20">
                                 <ArrowUpLeftIcon size="15" />
                             </v-avatar>
-                            <span class="text-subtitle-2 ml-2 font-weight-bold">+9%</span>
+                            <span class="text-subtitle-2 ml-2 font-weight-bold">+0%</span>
                             <span class="text-subtitle-2 text-muted ml-2">last year</span>
                         </div>
                         <div class="d-flex align-center mt-4 ml-1">

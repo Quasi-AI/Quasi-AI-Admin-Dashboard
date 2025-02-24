@@ -4,7 +4,7 @@ import type { recentTrans, productPerformanceType } from '@/types/dashboard/inde
 const recentTransaction: recentTrans[] = [
     {
         title: '09:30 am',
-        subtitle: 'Payment received from John Doe of $385.90',
+        subtitle: 'Payment received from rexton of $385.90',
         textcolor: 'primary',
         boldtext: false,
         line: true,
