@@ -30,6 +30,24 @@ const sidebarItem: menu[] = [
     icon: LayoutDashboardIcon,
     to: '/'
   },
+
+  { header: 'AI Dashboard' },
+  {
+    title: 'Analytics',
+    icon: LayoutDashboardIcon,
+    to: '/ai/analytics'
+  },
+  {
+    title: 'AI Configuration',
+    icon: LayoutDashboardIcon,
+    to: '/ai/config'
+  },
+  {
+    title: 'Database Management',
+    icon: LayoutDashboardIcon,
+    to: '/ai/data-management'
+  },
+
   { header: 'Students' },
   {
     title: "All Students",
@@ -61,11 +79,7 @@ const sidebarItem: menu[] = [
     icon: CircleDotIcon,
     to: '/pages/Payment-history'
 },
-{
-  title: 'Payment Methods',
-  icon: CircleDotIcon,
-  to: '/pages/Payment-Methods'
-},
+
 { header: 'Management' },
 {
     title: 'Email',
