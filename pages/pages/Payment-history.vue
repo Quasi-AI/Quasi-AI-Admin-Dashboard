@@ -90,8 +90,9 @@ const loadMoreData = async () => {
         const response = await axios.get(`${apiUrl}?page=${page.value}`);
 
         // Ensure response data exists and is an array
-        const payments = response.data?.data || [];
-
+        const payments = response.data;
+        console.log(response.data);
+        
         if (payments.length === 0) {
             hasMore.value = false;
         } else {

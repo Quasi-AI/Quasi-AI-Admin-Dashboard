@@ -3,7 +3,7 @@ import {
   AlertCircleIcon,
   CircleDotIcon,
   BoxMultiple1Icon,
-  LoginIcon, MoodHappyIcon, ApertureIcon, UserPlusIcon
+  LoginIcon, MoodHappyIcon, ApertureIcon, UserPlusIcon, FileAnalyticsIcon, SettingsIcon, DatabaseIcon, MoodKidIcon, ZoomMoneyIcon, CashIcon
 } from 'vue-tabler-icons';
 
 export interface menu {
@@ -34,24 +34,24 @@ const sidebarItem: menu[] = [
   { header: 'AI Dashboard' },
   {
     title: 'Analytics',
-    icon: LayoutDashboardIcon,
+    icon: FileAnalyticsIcon,
     to: '/ai/analytics'
   },
   {
     title: 'AI Configuration',
-    icon: LayoutDashboardIcon,
+    icon: SettingsIcon,
     to: '/ai/config'
   },
   {
     title: 'Database Management',
-    icon: LayoutDashboardIcon,
+    icon: DatabaseIcon,
     to: '/ai/data-management'
   },
 
   { header: 'Students' },
   {
     title: "All Students",
-    icon: MoodHappyIcon,
+    icon: MoodKidIcon,
     to: "/ui-components/Students",
   },
 
@@ -65,7 +65,7 @@ const sidebarItem: menu[] = [
   { header: 'Account' },
   {
     title: 'Add Admin',
-    icon: AlertCircleIcon,
+    icon: UserPlusIcon,
     to: '/pages/addAdmin'
   },
   {
@@ -76,7 +76,7 @@ const sidebarItem: menu[] = [
 { header: 'Payments' },
 {
     title: 'Payment history',
-    icon: CircleDotIcon,
+    icon: CashIcon,
     to: '/pages/Payment-history'
 },
 

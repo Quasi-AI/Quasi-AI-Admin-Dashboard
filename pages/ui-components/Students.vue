@@ -16,11 +16,12 @@
                                     <th class="text-left">Email</th>
                                     <th class="text-left">Sign Up date</th>
                                     <th class="text-left">Status</th>
+                                    <th class="text-left">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-if="!loading && filteredStudents.length === 0">
-                                    <td colspan="4" class="no-students">No students at the moment</td>
+                                    <td colspan="6" class="no-students">No students at the moment</td>
                                 </tr>
                                 <tr v-for="item in filteredStudents" :key="item.id">
                                     <td>
@@ -35,6 +36,25 @@
                                     <td :class="{'active-status': !item.status, 'inactive-status': item.status}">
                                         {{ item.status ? "Inactive" : "Active" }}
                                     </td>
+                                    <td>
+                                        <!-- Action Icons -->
+                                        <v-icon 
+                                            v-if="!item.status" 
+                                            @click="openDeleteDialog(item)" 
+                                            color="red" 
+                                            title="Delete User"
+                                        >
+                                            mdi-trash-can
+                                        </v-icon>
+                                        <v-icon 
+                                            v-else 
+                                            @click="activateUser(item.id)" 
+                                            color="green" 
+                                            title="Activate User"
+                                        >
+                                            mdi-account-check
+                                        </v-icon>
+                                    </td>
                                 </tr>
                             </tbody>
                         </v-table>
@@ -43,9 +63,23 @@
                 </UiChildCard>
             </v-col>
         </v-row>
+
+        <!-- Delete Confirmation Dialog -->
+        <v-dialog v-model="deleteDialog" max-width="400">
+            <v-card>
+                <v-card-title class="headline">Confirm Deletion</v-card-title>
+                <v-card-text>
+                    Are you sure you want to delete <strong>{{ selectedUser?.name }}</strong>? This action cannot be undone.
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey darken-1" text @click="deleteDialog = false">Cancel</v-btn>
+                    <v-btn color="red darken-1" text @click="confirmDelete">Delete</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
-
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
@@ -53,26 +87,69 @@ import axios from 'axios';
 import UiChildCard from '@/components/shared/UiChildCard.vue';
 
 const searchQuery = ref("");
-const allStudents = ref([]); // Holds all students fetched from API
-const visibleStudents = ref([]); // Data shown on screen
+const allStudents = ref([]); 
+const visibleStudents = ref([]);
 const loading = ref(false);
 const page = ref(1);
 const hasMore = ref(true);
 const apiUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/students/";
+const deleteAndActivaeApiUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/profile/delete/";
 
-const formatDate = (isoString) => {
-    const date = new Date(isoString);
-    return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-    });
+
+// Delete Dialog Data
+const deleteDialog = ref(false);
+const selectedUser = ref(null);
+
+// Open Delete Confirmation Dialog
+const openDeleteDialog = (user) => {
+    selectedUser.value = user;
+    deleteDialog.value = true;
 };
 
+// Confirm Deletion (Soft Delete: status = false)
+const confirmDelete = async () => {
+    if (!selectedUser.value) return;
+
+    try {
+        await axios.put(`${deleteAndActivaeApiUrl}${selectedUser.value.id}`, { 
+            email: selectedUser.value.email,
+            status: true
+        });
+
+        // Update the local state
+        allStudents.value = allStudents.value.map(student => 
+            student.id === selectedUser.value.id ? { ...student, status: true } : student
+        );
+        visibleStudents.value = [...allStudents.value];
+
+    } catch (error) {
+        console.error("Error deleting user:", error);
+    } finally {
+        deleteDialog.value = false;
+    }
+};
+
+// Activate User (Reactivate: status = true)
+const activateUser = async (userId, userEmail) => {
+    try {
+        await axios.put(`${deleteAndActivaeApiUrl}${userId}`, { 
+            email: selectedUser.value.email,
+            status: false
+        });
+
+        // Update the local state
+        allStudents.value = allStudents.value.map(student => 
+            student.id === userId ? { ...student, status: false } : student
+        );
+        visibleStudents.value = [...allStudents.value];
+
+    } catch (error) {
+        console.error("Error activating user:", error);
+    }
+};
+
+
+// Load More Data
 const loadMoreData = async () => {
     if (loading.value || !hasMore.value) return;
 
@@ -84,7 +161,6 @@ const loadMoreData = async () => {
         if (response.data.length === 0) {
             hasMore.value = false;
         } else {
-            // 🔥 Ensure no duplicates by using a Set
             const newStudents = response.data.data.filter(student => 
                 !allStudents.value.some(existing => existing.id === student.id)
             );
@@ -93,7 +169,7 @@ const loadMoreData = async () => {
                 hasMore.value = false;
             } else {
                 allStudents.value.push(...newStudents);
-                visibleStudents.value = [...allStudents.value]; // Update visible students
+                visibleStudents.value = [...allStudents.value];
                 page.value++;
             }
         }
@@ -103,7 +179,6 @@ const loadMoreData = async () => {
         loading.value = false;
     }
 };
-
 
 // Lazy Load on Scroll
 const handleScroll = (event) => {
@@ -134,12 +209,27 @@ const getInitials = (name) => {
         .map((n) => n[0])
         .join("");
 };
+
+const formatDate = (isoString) => {
+    if (!isoString) return "N/A"; // Handle empty dates
+    const date = new Date(isoString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    });
+};
+
 </script>
 
 <style scoped>
 .table-container {
-    max-height: 400px; /* Set max height */
-    overflow-y: auto; /* Enable scrolling */
+    max-height: 400px;
+    overflow-y: auto;
     border: 1px solid #ddd;
     position: relative;
 }
@@ -147,7 +237,7 @@ const getInitials = (name) => {
 .fixed-header {
     position: sticky;
     top: 0;
-    background-color: white; /* Ensure header is visible */
+    background-color: white;
     z-index: 10;
 }
 
@@ -183,7 +273,6 @@ const getInitials = (name) => {
     text-transform: uppercase;
 }
 
-/* Active & Inactive Status Colors */
 .active-status {
     color: green;
     font-weight: bold;
@@ -193,5 +282,4 @@ const getInitials = (name) => {
     color: red;
     font-weight: bold;
 }
-
 </style>

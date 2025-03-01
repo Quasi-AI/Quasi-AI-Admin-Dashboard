@@ -16,13 +16,14 @@
                                     <th class="text-left">Email</th>
                                     <th class="text-left">Sign up date</th>
                                     <th class="text-left">Status</th>
+                                    <th class="text-left">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-if="!loading && filteredStudents.length === 0">
-                                    <td colspan="4" class="no-students">No Educators at the moment</td>
+                                <tr v-if="!loading && filterededucators.length === 0">
+                                    <td colspan="4" class="no-educators">No Educators at the moment</td>
                                 </tr>
-                                <tr v-for="item in filteredStudents" :key="item.id">
+                                <tr v-for="item in filterededucators" :key="item.id">
                                     <td>
                                         <v-avatar size="40" class="avatar-container">
                                             <img v-if="item.profileImage" :src="item.profileImage" alt="Profile Image" class="avatar-image">
@@ -35,6 +36,25 @@
                                     <td :class="{'active-status': !item.status, 'inactive-status': item.status}">
                                         {{ item.status ? "Inactive" : "Active" }}
                                     </td>
+                                    <td>
+                                        <!-- Action Icons -->
+                                        <v-icon 
+                                            v-if="!item.status" 
+                                            @click="openDeleteDialog(item)" 
+                                            color="red" 
+                                            title="Delete User"
+                                        >
+                                            mdi-trash-can
+                                        </v-icon>
+                                        <v-icon 
+                                            v-else 
+                                            @click="activateUser(item.id)" 
+                                            color="green" 
+                                            title="Activate User"
+                                        >
+                                            mdi-account-check
+                                        </v-icon>
+                                    </td>
                                 </tr>
                             </tbody>
                         </v-table>
@@ -43,6 +63,20 @@
                 </UiChildCard>
             </v-col>
         </v-row>
+        <!-- Delete Confirmation Dialog -->
+        <v-dialog v-model="deleteDialog" max-width="400">
+            <v-card>
+                <v-card-title class="headline">Confirm Deletion</v-card-title>
+                <v-card-text>
+                    Are you sure you want to delete <strong>{{ selectedUser?.name }}</strong>? This action cannot be undone.
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey darken-1" text @click="deleteDialog = false">Cancel</v-btn>
+                    <v-btn color="red darken-1" text @click="confirmDelete">Delete</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
@@ -53,13 +87,65 @@ import axios from 'axios';
 import UiChildCard from '@/components/shared/UiChildCard.vue';
 
 const searchQuery = ref("");
-const allStudents = ref([]); // Holds all students fetched from API
-const visibleStudents = ref([]); // Data shown on screen
+const allEducators = ref([]); // Holds all educators fetched from API
+const visibleeducators = ref([]); // Data shown on screen
 const loading = ref(false);
 const page = ref(1);
 const hasMore = ref(true);
 const apiUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/educators/";
+const deleteAndActivaeApiUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/profile/delete/";
 
+// Delete Dialog Data
+const deleteDialog = ref(false);
+const selectedUser = ref(null);
+
+// Open Delete Confirmation Dialog
+const openDeleteDialog = (user) => {
+    selectedUser.value = user;
+    deleteDialog.value = true;
+};
+
+// Confirm Deletion (Soft Delete: status = false)
+const confirmDelete = async () => {
+    if (!selectedUser.value) return;
+
+    try {
+        await axios.put(`${deleteAndActivaeApiUrl}${selectedUser.value.id}`, { 
+            email: selectedUser.value.email,
+            status: true
+        });
+
+        // Update the local state
+        allEducators.value = allEducators.value.map(educator => 
+            educator.id === selectedUser.value.id ? { ...educator, status: true } : educator
+        );
+        visibleeducators.value = [...allEducators.value];
+
+    } catch (error) {
+        console.error("Error deleting user:", error);
+    } finally {
+        deleteDialog.value = false;
+    }
+};
+
+// Activate User (Reactivate: status = true)
+const activateUser = async (userId, userEmail) => {
+    try {
+        await axios.put(`${deleteAndActivaeApiUrl}${userId}`, { 
+            email: selectedUser.value.email,
+            status: false
+        });
+
+        // Update the local state
+        allEducators.value = allEducators.value.map(educator => 
+            educator.id === userId ? { ...educator, status: false } : educator
+        );
+        visibleeducators.value = [...allEducators.value];
+
+    } catch (error) {
+        console.error("Error activating user:", error);
+    }
+};
 
 const formatDate = (isoString) => {
     const date = new Date(isoString);
@@ -86,20 +172,20 @@ const loadMoreData = async () => {
             hasMore.value = false;
         } else {
             // 🔥 Ensure no duplicates by using a Set
-            const newStudents = response.data.data.filter(student => 
-                !allStudents.value.some(existing => existing.id === student.id)
+            const neweducators = response.data.data.filter(educator => 
+                !allEducators.value.some(existing => existing.id === educator.id)
             );
 
-            if (newStudents.length === 0) {
+            if (neweducators.length === 0) {
                 hasMore.value = false;
             } else {
-                allStudents.value.push(...newStudents);
-                visibleStudents.value = [...allStudents.value]; // Update visible students
+                allEducators.value.push(...neweducators);
+                visibleeducators.value = [...allEducators.value]; // Update visible educators
                 page.value++;
             }
         }
     } catch (error) {
-        console.error("Error fetching students:", error);
+        console.error("Error fetching educators:", error);
     } finally {
         loading.value = false;
     }
@@ -114,11 +200,11 @@ const handleScroll = (event) => {
     }
 };
 
-// Computed Property: Filters students by name or email
-const filteredStudents = computed(() => {
-    return visibleStudents.value.filter(student =>
-        student.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        student.email.toLowerCase().includes(searchQuery.value.toLowerCase())
+// Computed Property: Filters educators by name or email
+const filterededucators = computed(() => {
+    return visibleeducators.value.filter(educator =>
+        educator.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        educator.email.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
 });
 
@@ -152,13 +238,13 @@ const getInitials = (name) => {
     z-index: 10;
 }
 
-.loading-text, .no-students {
+.loading-text, .no-educators {
     text-align: center;
     padding: 15px;
     font-weight: bold;
 }
 
-.no-students {
+.no-educators {
     color: #888;
     font-size: 16px;
 }
