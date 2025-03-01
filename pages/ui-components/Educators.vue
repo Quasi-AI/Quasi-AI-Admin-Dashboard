@@ -2,7 +2,7 @@
     <v-container>
         <v-row class="month-table">
             <v-col cols="12" sm="12">
-                <UiChildCard title="Educators">
+                <UiChildCard :title="`Educators (${totalEducators})`">
                     <!-- Search Input -->
                     <v-text-field v-model="searchQuery" label="Search by name or email" clearable prepend-inner-icon="mdi-magnify"></v-text-field>
 
@@ -94,7 +94,7 @@ const page = ref(1);
 const hasMore = ref(true);
 const apiUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/educators/";
 const deleteAndActivaeApiUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/profile/delete/";
-
+const totalEducators = ref(0)
 // Delete Dialog Data
 const deleteDialog = ref(false);
 const selectedUser = ref(null);
@@ -171,6 +171,7 @@ const loadMoreData = async () => {
         if (response.data.length === 0) {
             hasMore.value = false;
         } else {
+            totalEducators.value = response.data.totalEducators
             // 🔥 Ensure no duplicates by using a Set
             const neweducators = response.data.data.filter(educator => 
                 !allEducators.value.some(existing => existing.id === educator.id)

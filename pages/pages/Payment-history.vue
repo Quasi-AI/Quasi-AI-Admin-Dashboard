@@ -2,7 +2,7 @@
     <v-container>
         <v-row>
             <v-col cols="12" md="12">
-                <UiParentCard title="Payment History">
+                <UiParentCard :title="`Payment History(${totalPayments})`">
                     <v-text-field 
                         v-model="searchQuery" 
                         label="Search by payer name or email" 
@@ -67,7 +67,7 @@ const loading = ref(false);
 const page = ref(1);
 const hasMore = ref(true);
 const apiUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/getAllPaymentHistory";
-
+const totalPayments = ref(0)
 // Format date to a readable format
 const formatDate = (isoString: string) => {
     const date = new Date(isoString);
@@ -90,12 +90,12 @@ const loadMoreData = async () => {
         const response = await axios.get(`${apiUrl}?page=${page.value}`);
 
         // Ensure response data exists and is an array
-        const payments = response.data;
-        console.log(response.data);
+        const payments = response.data.data;
         
         if (payments.length === 0) {
             hasMore.value = false;
         } else {
+            totalPayments.value = payments.totalPayments;
             // Avoid duplicates
             const newPayments = payments.filter(payment => 
                 !allPayments.value.some(existing => existing.id === payment.id)

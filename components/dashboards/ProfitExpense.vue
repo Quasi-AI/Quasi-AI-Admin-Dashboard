@@ -7,17 +7,31 @@
 
       <v-row>
         <v-col cols="12" class="pt-7">
-          <apexchart
-            type="bar"
-            height="370px"
-            :options="chartOptions"
-            :series="series"
-          />
+          <!-- Scrollable Container -->
+          <div class="chart-scroll-container">
+            <apexchart
+              type="bar"
+              height="370px"
+              :options="chartOptions"
+              :series="series"
+            />
+          </div>
         </v-col>
       </v-row>
     </v-card-item>
   </v-card>
 </template>
+
+<style scoped>
+/* Scrollable chart container */
+.chart-scroll-container {
+  overflow-x: auto; /* Enable horizontal scrolling */
+  white-space: nowrap; /* Prevents wrapping */
+  width: 100%; /* Ensures it takes full width */
+  max-width: 100vw; /* Avoids overflow issues */
+  padding-bottom: 10px; /* Space for scrollbar */
+}
+</style>
 
 
 <script setup lang="ts">

@@ -1,107 +1,54 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { useTheme } from 'vuetify';
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
 
-const theme = useTheme();
-const primary = theme.current.value.colors.primary;
-const lightprimary = theme.current.value.colors.lightprimary;
+const studentCount = ref(0);
+const educatorCount = ref(0);
+const isLoading = ref(true);
 
-const isUnderDevelopment = ref(true);
+// Fetch data from API and count items in the response
+const fetchData = async () => {
+  try {
+    const studentResponse = await axios.get("https://dark-caldron-448714-u5.uc.r.appspot.com/students/");
+    const educatorResponse = await axios.get("https://dark-caldron-448714-u5.uc.r.appspot.com/educators/");
 
-const chartOptions = computed(() => {
-    return {
-        series: [5368, 3500, 4106],
-        labels: ["5368", "Students Traffic", "Educators Traffic"],
-        chart: {
-            height: 170,
-            type: "donut",
-            fontFamily: "Plus Jakarta Sans', sans-serif",
-            foreColor: "#c6d1e9",
-        },
-        tooltip: {
-            theme: "dark",
-            fillSeriesColor: false,
-        },
-        colors: ["#e7ecf0", "#fb977d", primary],
-        dataLabels: {
-            enabled: false,
-        },
-        legend: {
-            show: false,
-        },
-        stroke: {
-            show: false,
-        },
-        responsive: [
-            {
-                breakpoint: 991,
-                options: {
-                    chart: {
-                        width: 150,
-                    },
-                },
-            },
-        ],
-        plotOptions: {
-            pie: {
-                donut: {
-                    size: '80%',
-                    background: "none",
-                    labels: {
-                        show: true,
-                        name: {
-                            show: true,
-                            fontSize: "12px",
-                            color: undefined,
-                            offsetY: 5,
-                        },
-                        value: {
-                            show: false,
-                            color: "#98aab4",
-                        },
-                    },
-                },
-            },
-        },
-    };
-});
+    // Count the number of students and educators from the response array
+    studentCount.value = studentResponse.data.totalStudents;
+    educatorCount.value = educatorResponse.data.totalEducators;
 
-const Chart = [38, 40, 25];
+  } catch (error) {
+    console.error("Error fetching traffic data:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const totalUsers = computed(() => studentCount.value + educatorCount.value);
+
+
+const formatNumber = (num: number) => {
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M+`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K+`;
+  return `${num}+`;
+};
+
+onMounted(fetchData);
 </script>
 
 <template>
-    <v-card elevation="10" class="withbg pa-3">
+    <v-card class="white-card pa-4">
         <v-card-item>
-            <div class="d-sm-flex align-center justify-space-between pt-sm-2">
-                <v-card-title class="text-h5">Traffic</v-card-title>
+            <div class="d-flex align-center justify-space-between">
+                <v-card-title class="text-h5 font-weight-medium">Total Users</v-card-title>
             </div>
-            <v-row>
-                <v-col cols="6" sm="7">
-                    <div class="mt-6">
-                        <h3 class="text-h4">$0</h3>
-                        <div class="mt-2">
-                            <v-avatar class="bg-lightsuccess text-success" size="20">
-                                <ArrowUpLeftIcon size="15" />
-                            </v-avatar>
-                            <span class="text-subtitle-2 ml-2 font-weight-bold">+0%</span>
-                            <span class="text-subtitle-2 text-muted ml-2">last year</span>
-                        </div>
-                        <div class="d-flex align-center mt-4 ml-1">
-                            <h6 class="text-subtitle-2 text-muted">
-                                <v-icon icon="mdi mdi-checkbox-blank-circle" class="mr-1" size="10"
-                                    color="primary"></v-icon> Students
-                            </h6>
-                            <h6 class="text-subtitle-2 text-muted pl-5">
-                                <v-icon icon="mdi mdi-checkbox-blank-circle" class="mr-1" size="10" color="error"></v-icon>
-                                Educators
-                            </h6>
-                        </div>
-                    </div>
-                </v-col>
-                <v-col cols="6" sm="5" class="pl-lg-0">
-                    <div class="d-flex align-center flex-shrink-0">
-                        <apexchart type="donut" height="170" :options="chartOptions" :series="Chart">
-                        </apexchart>
+            
+            <v-row class="mt-3">
+                <v-col cols="12">
+                    <div class="pa-4 text-center total-card">
+                        <h4 class="text-h6 textPrimary">Total Students + Educators</h4>
+                        <h2 class="text-h3 font-weight-bold">
+                          {{ isLoading ? 'Loading...' : formatNumber(totalUsers) }}
+                        </h2>
                     </div>
                 </v-col>
             </v-row>
@@ -109,3 +56,29 @@ const Chart = [38, 40, 25];
     </v-card>
 </template>
 
+<style scoped>
+/* Clean, white background with no shadow */
+.white-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+/* Centered, bold total users section */
+.total-card {
+    background: transparent;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* Text color */
+.textPrimary {
+    color: var(--v-primary-base) !important;
+}
+
+/* Subtle hover effect */
+.total-card:hover {
+    transform: scale(1.03);
+    transition: transform 0.2s ease-in-out;
+}
+</style>
