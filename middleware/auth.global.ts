@@ -61,7 +61,7 @@ const logSecurityAction = async (action: string, status: string) => {
     const ipAddress = await getUserIP();
 
     await axios.post("https://dark-caldron-448714-u5.uc.r.appspot.com/log-action", {
-      user: userEmail,
+      user: localStorage.getItem("email") || "Unknown",
       action,
       status,
       ipAddress,
