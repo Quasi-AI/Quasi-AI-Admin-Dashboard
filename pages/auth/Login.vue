@@ -2,7 +2,8 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-
+// import { setPermissions } from "~/permissionStore/permission";
+import { PermissionsManager } from "~/permissionStore/permission";
 // ✅ Define Page Layout
 definePageMeta({
   layout: "blank",
@@ -15,11 +16,10 @@ const alertMessage = ref("");
 const alertType = ref("error");
 const router = useRouter();
 
-// ✅ Regex Patterns
+
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-// ✅ Validation Computed Properties
 const emailError = computed(() => {
   if (!email.value) return "Email is required!";
   if (!emailPattern.test(email.value)) return "Enter a valid email!";
@@ -46,8 +46,13 @@ const login = async () => {
     });
 
     if (response.data.statusCode === 200) {
+      PermissionsManager.getInstance().setPermissions({});
+      localStorage.removeItem("permissions");
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("email", response.data.email);
+      const permissionsString = JSON.stringify(response.data.permissions);
+      PermissionsManager.getInstance().setPermissions(permissionsString);
+      localStorage.setItem("permissions", JSON.stringify(response.data.permissions));
       alertMessage.value = "Login successful!";
       alertType.value = "success";
 

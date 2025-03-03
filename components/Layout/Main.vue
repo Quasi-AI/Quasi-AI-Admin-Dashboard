@@ -5,8 +5,6 @@ import sidebarItems from '@/components/Layout/Full/vertical-sidebar/sidebarItem'
 import { Menu2Icon, BellRingingIcon } from 'vue-tabler-icons';
 const sidebarMenu = shallowRef(sidebarItems);
 const sDrawer = ref(true);
-
-
 </script>
 
 <template>
@@ -18,7 +16,7 @@ const sDrawer = ref(true);
         <perfect-scrollbar class="scrollnavbar bg-containerBg overflow-y-hidden">
             <v-list class="py-4 px-4 bg-containerBg">
                 <!---Menu Loop -->
-                <template v-for="(item, i) in sidebarMenu">
+                <template v-for="(item, i) in sidebarItems" :key="i">
                     <!---Item Sub Header -->
                     <LayoutFullVerticalSidebarNavGroup :item="item" v-if="item.header" :key="item.title" />
                     <!---Single Item-->

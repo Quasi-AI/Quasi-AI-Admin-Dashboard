@@ -317,7 +317,27 @@ const accessLevel = ref({
     canAccessFlashcards: false,
     canCreateFlashcards: false,
     canPlayLearningGames: false,
-    canLearnHowToCode: false
+    canLearnHowToCode: false,
+    dashboard: false,
+    aiAnalytics: false,
+    aiConfig: false,
+    databaseManagement: false,
+    students: false,
+    studentReports: false,
+    educators: false,
+    educatorReports: false,
+    payments: false,
+    invoices: false,
+    financialOverview: false,
+    admin: false,
+    addAdmin: false,
+    accessLevel: false,
+    securityLogs: false,
+    management: false,
+    emailManagement: false,
+    inbox: false,
+    feedbacks: false,
+    systemLogs: false
   }
 });
 

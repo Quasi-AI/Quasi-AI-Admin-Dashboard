@@ -6,3 +6,4 @@
     </NuxtLayout>
   </NuxtExampleLayout>
 </template>
+

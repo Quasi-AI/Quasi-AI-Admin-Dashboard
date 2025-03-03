@@ -8,6 +8,25 @@
                         + Add Admin
                     </v-btn>
 
+                    <!-- Add Admin Dialog -->
+                    <v-dialog v-model="showDialog" max-width="400px">
+                        <v-card>
+                            <v-card-title>Add Admin</v-card-title>
+                            <v-card-text>
+                                <v-text-field 
+                                    v-model="selectedEmail" 
+                                    label="Enter User Email"
+                                    clearable
+                                    :error-messages="!isValidEmail && selectedEmail ? 'Invalid email format' : ''"
+                                ></v-text-field>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-btn color="red" @click="showDialog = false">Cancel</v-btn>
+                                <v-btn color="green" @click="addAdmin" :disabled="!isValidEmail && selectedEmail">Submit</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+
                     <!-- Search Input -->
                     <v-text-field v-model="searchQuery" label="Search by name or email" clearable prepend-inner-icon="mdi-magnify"></v-text-field>
 
@@ -21,11 +40,13 @@
                                     <th class="text-left">Email</th>
                                     <th class="text-left">Sign up date</th>
                                     <th class="text-left">Status</th>
+                                    <th class="text-left">Admin Status</th>
+                                    <th class="text-left">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-if="!loading && filteredStudents.length === 0">
-                                    <td colspan="5" class="no-students">No Admin at the moment</td>
+                                    <td colspan="7" class="no-students">No Admin at the moment</td>
                                 </tr>
                                 <tr v-for="item in filteredStudents" :key="item.id">
                                     <td>
@@ -37,8 +58,20 @@
                                     <td>{{ item.name }}</td>
                                     <td>{{ item.email }}</td>
                                     <td>{{ formatDate(item.date) }}</td>
-                                    <td :class="{'active-status': !item.status, 'inactive-status': item.status}">
-                                        {{ item.status ? "Inactive" : "Active" }}
+                                    <td :class="{'active-status': item.status === false, 'inactive-status': item.status === true}">
+                                        {{ item.status === true ? "Inactive" : "Active" }}
+                                    </td>
+                                    <td :class="{'active-status': item.isAdmin === false, 'inactive-status': item.isAdmin === true}">
+                                        {{ item.isAdmin === true ? "Temporary Access" : "Admin" }}
+                                    </td>
+                                    <td>
+                                        <v-icon 
+                                            v-if="item.isAdmin === true" 
+                                            color="red" 
+                                            @click="revokeAdmin(item.email, item.id)"
+                                        >
+                                            mdi-trash-can
+                                        </v-icon>
                                     </td>
                                 </tr>
                             </tbody>
@@ -48,33 +81,8 @@
                 </UiChildCard>
             </v-col>
         </v-row>
-
-        <!-- 🚀 Admin Form Modal -->
-        <v-dialog v-model="showDialog" persistent max-width="500px">
-            <v-card>
-                <v-card-title class="headline">Add Admin</v-card-title>
-                <v-card-text>
-                    <v-text-field v-model="newAdmin.name" label="Name" required></v-text-field>
-                    <v-text-field v-model="newAdmin.email" label="Email" type="email" required></v-text-field>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="red" variant="text" @click="showDialog = false">Cancel</v-btn>
-                    
-                    <!-- 🔥 Disabled Save Button -->
-                    <v-tooltip text="In Development">
-                        <template v-slot:activator="{ props }">
-                            <v-btn color="primary" v-bind="props" disabled>Save</v-btn>
-                        </template>
-                    </v-tooltip>
-
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </v-container>
 </template>
-
-
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
@@ -82,21 +90,17 @@ import axios from 'axios';
 import UiChildCard from '@/components/shared/UiChildCard.vue';
 
 const searchQuery = ref("");
-const allStudents = ref([]); // Holds all students fetched from API
-const visibleStudents = ref([]); // Data shown on screen
+const allStudents = ref([]);
+const visibleStudents = ref([]);
+const selectedUser = ref(null);
+const showDialog = ref(false);
 const loading = ref(false);
 const page = ref(1);
 const hasMore = ref(true);
-const showDialog = ref(false); // Controls the modal visibility
-
-// Admin Form Data (Unused for now)
-const newAdmin = ref({
-    name: "",
-    email: "",
-});
-
 const apiUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/admins/";
-
+const revokeAdminUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/user/revokeAdmin";
+const addAdminUrl = "https://dark-caldron-448714-u5.uc.r.appspot.com/user/grantAdmin";
+const selectedEmail = ref("")
 
 const formatDate = (isoString) => {
     const date = new Date(isoString);
@@ -111,18 +115,20 @@ const formatDate = (isoString) => {
     });
 };
 
+const isValidEmail = computed(() => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(selectedEmail.value);
+});
+
 const loadMoreData = async () => {
     if (loading.value || !hasMore.value) return;
-
     loading.value = true;
 
     try {
         const response = await axios.get(`${apiUrl}?page=${page.value}`);
-
         if (response.data.length === 0) {
             hasMore.value = false;
         } else {
-            // 🔥 Ensure no duplicates by using a Set
             const newStudents = response.data.filter(student => 
                 !allStudents.value.some(existing => existing.id === student.id)
             );
@@ -131,7 +137,7 @@ const loadMoreData = async () => {
                 hasMore.value = false;
             } else {
                 allStudents.value.push(...newStudents);
-                visibleStudents.value = [...allStudents.value]; // Update visible students
+                visibleStudents.value = [...allStudents.value];
                 page.value++;
             }
         }
@@ -142,14 +148,51 @@ const loadMoreData = async () => {
     }
 };
 
+// Handle Admin Revocation
+const revokeAdmin = async (email, adminId) => {
+    try {
+        await axios.put(revokeAdminUrl, {
+            email: email,
+            isAdmin: false
+        });
 
-// Lazy Load on Scroll
-const handleScroll = (event) => {
-    const { scrollTop, scrollHeight, clientHeight } = event.target;
-    if (scrollTop + clientHeight >= scrollHeight - 20) {
-        loadMoreData();
+        // Remove from UI after successful revocation
+        allStudents.value = allStudents.value.filter(admin => admin.id !== adminId);
+        visibleStudents.value = [...allStudents.value];
+
+    } catch (error) {
+        console.error("Error revoking admin:", error);
     }
 };
+
+// Handle Adding Admin
+const addAdmin = async () => {
+    if (!selectedEmail.value) {
+        console.warn("No user selected.");
+        return;
+    }
+
+    try {
+        const response = await axios.put(addAdminUrl, {
+            email: selectedEmail.value,
+            isAdmin: true
+        });
+
+        // Update UI: Set isAdmin to true for selected user
+        const userIndex = allStudents.value.findIndex(user => user.email === selectedEmail.value);
+        if (userIndex !== -1) {
+            allStudents.value[userIndex].isAdmin = true;
+        }
+        visibleStudents.value = [...allStudents.value];
+
+        showDialog.value = false;
+        selectedUser.value = null;
+        loadMoreData();
+    } catch (error) {
+        console.error("Error adding admin:", error.response?.data || error.message);
+    }
+};
+
 
 // Computed Property: Filters students by name or email
 const filteredStudents = computed(() => {
@@ -157,6 +200,16 @@ const filteredStudents = computed(() => {
         student.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         student.email.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
+});
+
+// Computed Property: List of Non-Admins for Selection
+const nonAdmins = computed(() => {
+    return allStudents.value
+        .filter(student => !student.isAdmin)
+        .map(student => ({
+            email: student.email,
+            name: `${student.name} (${student.email})`
+        }));
 });
 
 // Fetch initial data
@@ -174,11 +227,10 @@ const getInitials = (name) => {
 };
 </script>
 
-
 <style scoped>
 .table-container {
-    max-height: 400px; /* Set max height */
-    overflow-y: auto; /* Enable scrolling */
+    max-height: 400px;
+    overflow-y: auto;
     border: 1px solid #ddd;
     position: relative;
 }
@@ -186,7 +238,7 @@ const getInitials = (name) => {
 .fixed-header {
     position: sticky;
     top: 0;
-    background-color: white; /* Ensure header is visible */
+    background-color: white;
     z-index: 10;
 }
 
@@ -232,5 +284,4 @@ const getInitials = (name) => {
     color: red;
     font-weight: bold;
 }
-
 </style>

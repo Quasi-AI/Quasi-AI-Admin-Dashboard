@@ -1,4 +1,5 @@
 import axios from "axios";
+import { PermissionsManager } from "~/permissionStore/permission";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   if (process.server) return; // ✅ Skip middleware on server-side
@@ -51,6 +52,7 @@ const logoutUser = async () => {
   await logSystemAction("User logged out", "INFO", "/logout");
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  PermissionsManager.getInstance().clearPermissions();
 };
 
 // ✅ Function to Log Security Actions to Backend
@@ -61,7 +63,7 @@ const logSecurityAction = async (action: string, status: string) => {
     const ipAddress = await getUserIP();
 
     await axios.post("https://dark-caldron-448714-u5.uc.r.appspot.com/log-action", {
-      user: localStorage.getItem("email") || "Unknown",
+      user: userEmail,
       action,
       status,
       ipAddress,
