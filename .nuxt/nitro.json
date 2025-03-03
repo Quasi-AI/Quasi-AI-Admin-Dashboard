@@ -1,9 +1,5 @@
 {
-<<<<<<< Updated upstream
-  "date": "2025-03-03T04:41:44.443Z",
-=======
-  "date": "2025-03-03T04:33:05.647Z",
->>>>>>> Stashed changes
+  "date": "2025-03-03T07:47:19.284Z",
   "preset": "nitro-dev",
   "framework": {
     "name": "nitro",
@@ -15,11 +11,7 @@
   "dev": {
     "pid": 47879,
     "workerAddress": {
-<<<<<<< Updated upstream
-      "socketPath": "/var/folders/71/7f24xg6s781004l9rzsnfgcr0000gn/T/nitro/worker-47879-17.sock"
-=======
-      "socketPath": "/var/folders/71/7f24xg6s781004l9rzsnfgcr0000gn/T/nitro/worker-47879-12.sock"
->>>>>>> Stashed changes
+      "socketPath": "/var/folders/71/7f24xg6s781004l9rzsnfgcr0000gn/T/nitro/worker-47879-27.sock"
     }
   }
 }
