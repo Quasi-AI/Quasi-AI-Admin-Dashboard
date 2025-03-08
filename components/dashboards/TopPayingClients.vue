@@ -1,63 +1,81 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
-const items = ref([
-    { title: "Action" },
-    { title: "Another action" },
-    { title: "Something else here" },
-]);
+// Define the expected data structure
+interface Educator {
+  _id: string;
+  name: string;
+  email: string;
+  position: string;
+  earned: number;
+}
+
+// Explicitly type the `educators` array
+const educators = ref<Educator[]>([]);
+const loading = ref(true);
+const errorMessage = ref('');
+
+const fetchEducators = async () => {
+  try {
+    const response = await axios.get<Educator[]>('https://dark-caldron-448714-u5.uc.r.appspot.com/tutor/top');
+    educators.value = response.data;
+  } catch (error) {
+    errorMessage.value = 'Failed to load educators. Please try again.';
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(fetchEducators);
 </script>
+
 <template>
-    <v-card elevation="10" class="pb-5">
-        <v-card-item class="pa-6">
-            <div class="d-flex align-center justify-space-between">
-                <div>
-                    <h5 class="text-h5 mb-1 font-weight-semibold">Top Paying Educator</h5>
-                </div>
-                <div>
-                    <v-menu bottom left>
-                        <template v-slot:activator="{ props }">
-                            <v-btn icon color="inherit" v-bind="props" flat>
-                                <DotsVerticalIcon stroke-width="1.5" size="24" class="text-grey100" />
-                            </v-btn>
-                        </template>
-                        <v-list density="compact">
-                            <v-list-item v-for="(item, i) in items" :key="i" :value="i">
-                                <v-list-item-title>{{ item.title }}</v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
-                </div>
-            </div>
+  <v-card elevation="10" class="pb-5">
+    <v-card-item class="pa-6">
+      <div class="d-flex align-center justify-space-between">
+        <h5 class="text-h5 mt-1 mb-4 font-weight-semibold">Top Paying Educators</h5>
+      </div>
+
+      <div class="table-container">
         <v-table class="month-table">
-            <thead>
-                <tr>
-                    <th class="text-subtitle-1 font-weight-bold">Id</th>
-                    <th class="text-subtitle-1 font-weight-bold">Assigned</th>
-                    <th class="text-subtitle-1 font-weight-bold">Name</th>
-                    <th class="text-subtitle-1 font-weight-bold text-right">Earned</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="item in productPerformance" :key="item.name" class="month-item">
-                    <td>
-                        <p class="text-15 font-weight-medium">{{ item.id }}</p>
-                    </td>
-                    <td>
-                        <div class="">
-                                <h6 class="text-subtitle-1 font-weight-bold">{{ item.name }}</h6>
-                                <div class="text-subtitle-2 mt-1 text-muted">{{ item.post }}</div>
-                        </div>
-                    </td>
-                    <td>
-                        <h6 class="text-body-1 text-muted">{{ item.pname }}</h6>
-                    </td>
-                    <td>
-                        <h6 class="text-h6 text-right">{{ item.budget }}</h6>
-                    </td>
-                </tr>
-            </tbody>
+          <thead>
+            <tr>
+              <th class="text-subtitle-1 font-weight-bold">Name</th>
+              <th class="text-subtitle-1 font-weight-bold">course</th>
+              <th class="text-subtitle-1 font-weight-bold">Email</th>
+              <th class="text-subtitle-1 font-weight-bold text-right">Earned</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="loading">
+              <td colspan="4" class="text-center">Loading...</td>
+            </tr>
+            <tr v-if="errorMessage">
+              <td colspan="4" class="text-center text-red">{{ errorMessage }}</td>
+            </tr>
+            <tr v-for="educator in educators" :key="educator._id">
+              <td>{{ educator.name }}</td>
+              <td>
+                <h6 class="text-subtitle-1 font-weight-bold">{{ educator.position }}</h6>
+              </td>
+              <td>
+                <h6 class="text-body-1 text-muted">{{ educator.email }}</h6>
+              </td>
+              <td class="text-right">
+                <h6 class="text-h6">{{ educator.earned }}</h6>
+              </td>
+            </tr>
+          </tbody>
         </v-table>
-        </v-card-item>
-    </v-card>
+      </div>
+    </v-card-item>
+  </v-card>
 </template>
+
+<style scoped>
+.table-container {
+  max-height: 300px; /* Adjust height as needed */
+  overflow-y: auto;
+}
+</style>
