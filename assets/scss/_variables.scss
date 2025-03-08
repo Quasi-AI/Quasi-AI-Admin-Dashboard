@@ -1,11 +1,16 @@
-@use 'sass:math';
-@use 'sass:map';
-@use 'sass:meta';
-@use 'vuetify/lib/styles/tools/functions' as *;
+@use "sass:map";
+@use  'sass:math';
+@use  'sass:meta';
+@use  'vuetify/lib/styles/tools/functions' as *;
 
-// Custom Variables
+
 // colors
 $white: #fff !default;
+
+$shades: (
+  'white': #ffffff,
+  'black': #000000
+) !default;
 
 // cards
 $card-title-size: 18px !default;

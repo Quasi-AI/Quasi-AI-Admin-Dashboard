@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     transpile: ["vuetify"],
   },
   nitro: {
+    compatibilityDate: '2025-03-06',
     serveStatic: true,
   },
   sourcemap: { server: false, client: false },
