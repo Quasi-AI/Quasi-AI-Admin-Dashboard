@@ -2,7 +2,6 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-// import { setPermissions } from "~/permissionStore/permission";
 import { PermissionsManager } from "~/permissionStore/permission";
 // ✅ Define Page Layout
 definePageMeta({
@@ -50,6 +49,7 @@ const login = async () => {
       localStorage.removeItem("permissions");
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("email", response.data.email);
+      localStorage.setItem("name", response.data.name);
       const permissionsString = JSON.stringify(response.data.permissions);
       PermissionsManager.getInstance().setPermissions(permissionsString);
       localStorage.setItem("permissions", JSON.stringify(response.data.permissions));
