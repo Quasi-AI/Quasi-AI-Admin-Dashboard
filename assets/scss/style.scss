@@ -1,22 +1,16 @@
-@use './variables';
-@use 'vuetify/styles/main.sass';
-@use './override';
-@use './layout/container';
-@use './layout/sidebar';
-@use './layout/topbar';
-@use './components/VButtons';
-@use './components/VCard';
-@use './components/VInput';
-@use './components/VNavigationDrawer';
-@use './components/VShadow';
-@use './components/VTextField';
-@use './pages/dashboards';
-@use './pages/authentication';
-@use 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css';
-
-/* Move @import after @use */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap");
-
-body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
+@import './variables';
+@import 'vuetify/styles/main.sass';
+@import './override';
+@import './layout/container';
+@import './layout/sidebar';
+@import './layout/topbar';
+@import './components/VButtons';
+@import './components/VCard';
+@import './components/VInput';
+@import './components/VNavigationDrawer';
+@import './components/VShadow';
+@import './components/VTextField';
+@import './pages/dashboards';
+@import './pages/authentication';
+@import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css';

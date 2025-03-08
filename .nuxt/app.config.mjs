@@ -1,6 +1,6 @@
 
 import { updateAppConfig } from '#app'
-import { defuFn } from '/Users/user/Documents/GitHub/Quasi-AI-Admin-Dashboard/node_modules/defu/dist/defu.mjs'
+import { defuFn } from 'C:/Users/RextonItsiah/Documents/GitHub/Quasi-AI-Admin-Dashboard/node_modules/defu/dist/defu.mjs'
 
 const inlineConfig = {
   "nuxt": {}

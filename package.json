@@ -1,5 +1,5 @@
 {
-  "name": "quasiai",
+  "name": "spikeadmin",
   "private": true,
   "scripts": {
     "build": "nuxt build",
@@ -10,7 +10,6 @@
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^2.1.0",
     "nuxt": "3.7.4"
   },
   "dependencies": {
