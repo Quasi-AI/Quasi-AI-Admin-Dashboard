@@ -2,7 +2,7 @@ import {
   LayoutDashboardIcon, FileAnalyticsIcon, SettingsIcon, DatabaseIcon, MoodKidIcon, 
   ChartPieIcon, MoodHappyIcon, ReportMoneyIcon, CashIcon, FileInvoiceIcon, 
   CashBanknoteIcon, UserPlusIcon, AlertCircleIcon, KeyIcon, ApertureIcon, 
-  BoxMultiple1Icon, LayersIntersectIcon
+  BoxMultiple1Icon, LayersIntersectIcon, ActivityIcon, ChartBubbleIcon, ReportAnalyticsIcon
 } from 'vue-tabler-icons';
 
 import { computed } from 'vue';
@@ -131,11 +131,19 @@ const sidebarItem: menu[] = [
     to: '/pages/feedbacks',
     permission: "feedbacks",
   },
+  
   {
     title: 'System Logs',
     icon: LayersIntersectIcon,
     to: '/pages/system-logs',
     permission: "systemLogs",
+  },
+  { header: 'Report' },
+  {
+    title: 'Reported Issues',
+    icon: ReportAnalyticsIcon,
+    to: '/pages/audit-logs'
+    // permission: "payments",
   },
 ];
 
