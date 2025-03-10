@@ -6,9 +6,9 @@ import axios from 'axios';
 interface Educator {
   _id: string;
   name: string;
-  email: string;
-  position: string;
-  earned: number;
+  subject: string;
+  bios: string;
+  price: number;
 }
 
 // Explicitly type the `educators` array
@@ -42,9 +42,8 @@ onMounted(fetchEducators);
           <thead>
             <tr>
               <th class="text-subtitle-1 font-weight-bold">Name</th>
-              <th class="text-subtitle-1 font-weight-bold">course</th>
-              <th class="text-subtitle-1 font-weight-bold">Email</th>
-              <th class="text-subtitle-1 font-weight-bold text-right">Earned</th>
+              <th class="text-subtitle-1 font-weight-bold">subject</th>
+              <th class="text-subtitle-1 font-weight-bold text-right">price</th>
             </tr>
           </thead>
           <tbody>
@@ -57,13 +56,10 @@ onMounted(fetchEducators);
             <tr v-for="educator in educators" :key="educator._id">
               <td>{{ educator.name }}</td>
               <td>
-                <h6 class="text-subtitle-1 font-weight-bold">{{ educator.position }}</h6>
-              </td>
-              <td>
-                <h6 class="text-body-1 text-muted">{{ educator.email }}</h6>
+                <h6 class="text-body-1 text-muted">{{ educator.subject }}</h6>
               </td>
               <td class="text-right">
-                <h6 class="text-h6">{{ educator.earned }}</h6>
+                <h6 class="text-h6">{{ educator.price }}</h6>
               </td>
             </tr>
           </tbody>
