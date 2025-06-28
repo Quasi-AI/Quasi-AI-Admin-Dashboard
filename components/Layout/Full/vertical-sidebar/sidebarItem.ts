@@ -22,14 +22,20 @@ export interface menu {
 
 
 const sidebarItem: menu[] = [
-  { header: 'Home' },
+  { header: 'Qwesi' },
   {
     title: 'Dashboard',
     icon: LayoutDashboardIcon,
-    to: '/',
+    to: '/dashboards/qwesi',
     permission: 'dashboard',
   },
-  { header: 'AI Dashboard' },
+  { header: 'Quasi' },
+  {
+    title: 'Dashboard',
+    icon: LayoutDashboardIcon,
+    to: '/dashboards/quasi',
+    permission: 'Qwesi dashboard',
+  },
   {
     title: 'Analytics',
     icon: FileAnalyticsIcon,
